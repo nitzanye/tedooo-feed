@@ -1,5 +1,6 @@
 .header {
   background-color: white;
+  width: 100%;
 }
 
 .header__wrraper {
@@ -85,6 +86,7 @@
 
 @media screen and (max-width: 799px) {
   .header__text,
+  .active__text,
   .navbar__text {
     display: none;
   }
