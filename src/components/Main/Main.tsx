@@ -16,29 +16,35 @@ const Main = () => {
 
   const url = 'https://dev.tedooo.com/hw/feed.json';
 
-  useEffect(() => {
-    const getCards = async () => {
-      try {
-        const res = await fetch(`${url}?skip=${skip}`);
-        const data: CardProps = await res.json();     
+  const getCards = async () => {
+    try {
+      const res = await fetch(`${url}?skip=${skip}&limit=6`);
+      const data: { hasMore: boolean; data: CardData[] } = await res.json();
+      // const data: CardProps = await res.json();     
+
+      if (hasMore && data.hasMore) {
         const cardsList = data.data;
         setCards(prevCards => [...prevCards, ...cardsList]);
         setSkip(prevSkip => prevSkip + cardsList.length);
-        setHasMore(data.hasMore);
-      } catch (error) {
-        console.error(error);
       }
-    };
 
-    if (hasMore) {
+      setHasMore(data.hasMore);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (skip === 0) {
       getCards();
     }
-  }, [skip, hasMore]);
+  }, [skip, hasMore, getCards]);
 
   // Handle scrolling to the page bottom
   const handleScroll = () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight && hasMore) {
       setSkip(prevSkip => prevSkip + 6);
+      getCards(); // fetch the next 6 cards
     }
   };
   
@@ -50,6 +56,27 @@ const Main = () => {
     };
   }, [hasMore, handleScroll]);
 
+  
+   // Send impression only once for each card 
+  useEffect(() => {
+    const sendImpression = async (cardId: string) => {
+      try {
+        await fetch(`https://www.tedooo.com/?itemId=${cardId}` , {
+          mode: 'no-cors'
+        });
+      } catch (error) {
+        console.error(`Error sending impression for card ${cardId}: ${error}`);
+      }
+    };
+
+    cards.forEach((card) => {
+      if (!card.impressionSent) {
+        sendImpression(card.id);
+        card.impressionSent = true;
+      }
+    });
+  }, [cards]);
+  
   return (
     <main className="main">
       <ul className="cards__list">
@@ -62,3 +89,4 @@ const Main = () => {
 }
 
 export default Main;
+

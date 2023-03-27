@@ -28,20 +28,6 @@ const Card = ({ card }: CardProps) => {
   const date = card.date;
   const timeDiff = moment(date).fromNow();
  
-  useEffect(() => {
-    const sendImpression = async () => {
-      try {
-        await fetch(`https://www.tedooo.com/?itemId=${card.id}` , {
-          mode: 'no-cors'
-        });
-        // console.log(`Sent impression for card ${card.id}`);
-      } catch (error) {
-        console.error(`Error sending impression for card ${card.id}: ${error}`);
-      }
-    };
-    sendImpression();
-  }, [card.id]);
-
   return (
     <div className="card">
       <div className="card__header">
