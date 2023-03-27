@@ -1,0 +1,14 @@
+.main {
+  margin: 0 auto;
+  margin-top: 24px;
+}
+
+.cards__list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  gap: 24px;
+  box-shadow: 0px 1px 7px 0px #282f2d12;
+  padding: 0;
+}
