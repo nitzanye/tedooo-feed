@@ -19,7 +19,7 @@ const Card = ({ card }: CardProps) => {
   const [totalLikes, setTotalLikes] = useState(card.likes);
 
   const isElementInViewport = () => {
-    var rect = cardRef.current.getBoundingClientRect();
+    const rect = cardRef.current.getBoundingClientRect();
     return (
       rect.top >= 0 &&
       rect.left >= 0 &&
@@ -44,7 +44,7 @@ const Card = ({ card }: CardProps) => {
 
   useEffect(() => {
     window.addEventListener('scroll', onScroll);
-    
+
     return () => {
       window.removeEventListener('scroll', onScroll);
     }
