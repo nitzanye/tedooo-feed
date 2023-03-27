@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import moment from "moment";
 import './Card.css';
 import totalLikesIcon from '../../images/totalLikesIcon.png';
@@ -13,8 +13,42 @@ interface CardProps {
 }
 
 const Card = ({ card }: CardProps) => {
+  const sentImpressionRef = useRef(false);
+  const cardRef = useRef() as any;
   const [liked, setLiked] = useState(false);
   const [totalLikes, setTotalLikes] = useState(card.likes);
+
+  const isElementInViewport = () => {
+    var rect = cardRef.current.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+
+  const onScroll = useCallback(async() => {
+    if (sentImpressionRef.current) { return; }
+
+    const isInViewPort = isElementInViewport();
+
+    if (isInViewPort) {
+      sentImpressionRef.current = true;
+
+      await fetch(`https://www.tedooo.com/?itemId=${card.id}` , {
+        mode: 'no-cors'
+      });
+    }
+  }, [card.id]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', onScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    }
+  }, [onScroll]);
 
   const handleLike = () => {
     if (liked) {
@@ -29,7 +63,7 @@ const Card = ({ card }: CardProps) => {
   const timeDiff = moment(date).fromNow();
  
   return (
-    <div className="card">
+    <div ref={cardRef} className="card">
       <div className="card__header">
         <img className="card__avatar" src={card.avatar} alt={card.username} />
         <div className="card-info">

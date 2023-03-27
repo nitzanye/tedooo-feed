@@ -12,5 +12,4 @@ export interface CardData {
   likes: number;
   didLike: boolean;
   premium: boolean;
-  impressionSent : boolean;
 }

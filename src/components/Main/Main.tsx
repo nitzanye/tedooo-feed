@@ -1,52 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Card from "../Card/Card";
 import './Main.css';
 import { CardData } from "../../types/CardData";
 
-interface CardProps {
-  hasMore: boolean;
-  data: CardData[];
-  key: string;
-}
+// interface CardProps {
+//   hasMore: boolean;
+//   data: CardData[];
+//   key: string;
+// }
 
 const Main = () => {
   const [cards, setCards] = useState<CardData[]>([]);
   const [skip, setSkip] = useState<number>(0);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const hasMoreRef = useRef(true);
 
   const url = 'https://dev.tedooo.com/hw/feed.json';
 
-  const getCards = async () => {
+  const getCards = useCallback(async () => {
     try {
       const res = await fetch(`${url}?skip=${skip}&limit=6`);
       const data: { hasMore: boolean; data: CardData[] } = await res.json();
-      // const data: CardProps = await res.json();     
 
-      if (hasMore && data.hasMore) {
-        const cardsList = data.data;
-        setCards(prevCards => [...prevCards, ...cardsList]);
-        setSkip(prevSkip => prevSkip + cardsList.length);
-      }
-
-      setHasMore(data.hasMore);
+      const cardsList = data.data;
+      setCards(prevCards => [...prevCards, ...cardsList]);
+      hasMoreRef.current = data.hasMore;
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [skip]);
 
   useEffect(() => {
-    if (skip === 0) {
       getCards();
-    }
-  }, [skip, hasMore, getCards]);
+  }, [getCards]);
 
   // Handle scrolling to the page bottom
-  const handleScroll = () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight && hasMore) {
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight && hasMoreRef.current) {
       setSkip(prevSkip => prevSkip + 6);
-      getCards(); // fetch the next 6 cards
     }
-  };
+  }, []);
   
   // Add scroll event listener to window
   useEffect(() => {
@@ -54,28 +46,7 @@ const Main = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [hasMore, handleScroll]);
-
-  
-   // Send impression only once for each card 
-  useEffect(() => {
-    const sendImpression = async (cardId: string) => {
-      try {
-        await fetch(`https://www.tedooo.com/?itemId=${cardId}` , {
-          mode: 'no-cors'
-        });
-      } catch (error) {
-        console.error(`Error sending impression for card ${cardId}: ${error}`);
-      }
-    };
-
-    cards.forEach((card) => {
-      if (!card.impressionSent) {
-        sendImpression(card.id);
-        card.impressionSent = true;
-      }
-    });
-  }, [cards]);
+  }, [handleScroll]);
   
   return (
     <main className="main">
