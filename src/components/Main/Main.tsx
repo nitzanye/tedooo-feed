@@ -3,44 +3,36 @@ import Card from "../Card/Card";
 import './Main.css';
 import { CardData } from "../../types/CardData";
 
-// interface CardProps {
-//   hasMore: boolean;
-//   data: CardData[];
-//   key: string;
-// }
-
 const Main = () => {
   const [cards, setCards] = useState<CardData[]>([]);
   const [skip, setSkip] = useState<number>(0);
   const hasMoreRef = useRef(true);
-
   const url = 'https://dev.tedooo.com/hw/feed.json';
 
   const getCards = useCallback(async () => {
     try {
       const res = await fetch(`${url}?skip=${skip}&limit=6`);
       const data: { hasMore: boolean; data: CardData[] } = await res.json();
-
       const cardsList = data.data;
       setCards(prevCards => [...prevCards, ...cardsList]);
       hasMoreRef.current = data.hasMore;
     } catch (error) {
       console.error(error);
     }
-  }, [skip]);
+  },[skip]);
 
   useEffect(() => {
-      getCards();
-  }, [getCards]);
+    getCards();
+  },[getCards])
 
   // Handle scrolling to the page bottom
   const handleScroll = useCallback(() => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight && hasMoreRef.current) {
+    if (window.innerHeight + Math.ceil(window.scrollY) >= document.body.offsetHeight && hasMoreRef.current) {
       setSkip(prevSkip => prevSkip + 6);
     }
   }, []);
   
-  // Add scroll event listener to window
+ // Add scroll event listener to window
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => {
