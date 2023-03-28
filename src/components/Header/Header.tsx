@@ -8,7 +8,7 @@ import avatar from '../../images/avatar.png';
 
 const Header = () => {
   return (
-    <section className="header">
+    <header className="header">
       <div className="header__wrraper">
         <div className="logo__wrapper">
             <img className="logo" src={logo} alt="Tedooo logo"/>
@@ -18,7 +18,7 @@ const Header = () => {
             </div>
         </div>
 
-        <div className="navbar">
+        <nav className="navbar">
           <div className="navbar__wrapper navbar__wrraper-home">
             <img className="navbar__img" alt="Home Icon" src={homeIcon}/>
             <p className="active__text">Home</p> 
@@ -35,9 +35,9 @@ const Header = () => {
           </div>
 
           <img className="avatar" src={avatar} alt="Avatar"/>
-        </div>
+        </nav>
       </div>
-    </section>
+    </header>
   );
 }
 
